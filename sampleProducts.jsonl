@@ -1,0 +1,4 @@
+{"input:"
+{"product": {"title": "Sample Product 1", "variants": [{"price": "19.99"}]}}
+{"product": {"title": "Sample Product 2", "variants": [{"price": "29.99"}]}}
+}
