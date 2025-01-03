@@ -1,67 +1,81 @@
-require("dotenv").config();
 const axios = require("axios");
-const { fetchProducts, getQuery } = require("./utils.js");
+require("dotenv").config();
 
-const SHOPIFY_URL = `https://${process.env.SHOPIFY_STORE}.myshopify.com/admin/api/2024-10/graphql.json`;
+const SHOPIFY_URL = `https://${process.env.SHOPIFY_STORE}/admin/api/2024-10/graphql.json`;
 const SHOPIFY_ACCESS_TOKEN = process.env.SHOPIFY_ACCESS_TOKEN;
+
+// Headers for Shopify API
+const headers = {
+  "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN,
+  "Content-Type": "application/json",
+};
 
 //fetchProducts(SHOPIFY_URL, SHOPIFY_ACCESS_TOKEN);
 // GraphQL query to fetch products
-// const query = `
-//   {
-//     products(first: 5) {
-//       edges {
-//         node {
-//           id
-//           title
-//           handle
-//           description
-//           variants(first: 1) {
-//             edges {
-//               node {
-//                 id
-//                 title
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// `;
-//getQuery(SHOPIFY_URL, query);
-
-// Create Product
-async function createProduct() {
-  const mutation = `
-      mutation {
-        productCreate(input: {
-          title: "New Product",
-          descriptionHtml: "<p>This is a new product</p>",
-          variants: [{ price: "29.99", sku: "NEW123" }]
-        }) {
-          product {
+const query = `
+    query GetProducts($first: Int!, $after: String) {
+      products(first: $first, after: $after) {
+        edges {
+          cursor
+          node {
             id
             title
-          }
-          userErrors {
-            field
-            message
+            handle
+            createdAt
+            updatedAt
+            variants(first: 10) {
+              edges {
+                node {
+                  id
+                  title
+                  sku
+                  price
+                }
+              }
+            }
           }
         }
+        pageInfo {
+          hasNextPage
+        }
       }
-    `;
-  const response = await axios.post(
-    SHOPIFY_URL,
-    { query: mutation },
-    {
-      headers: {
-        "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN,
-        "Content-Type": "application/json",
-      },
     }
-  );
-  console.log(JSON.stringify(response.data, null, 2));
-}
+  `;
 
-createProduct();
+const getProduct = async () => {
+  let products = [];
+  let hasNextPage = true;
+  let cursor = null;
+  try {
+    while (hasNextPage) {
+      const variables = {
+        first: 50, // Fetch 50 products per request
+        after: cursor,
+      };
+      const response = await axios.post(
+        SHOPIFY_URL,
+        { query, variables },
+        {
+          headers,
+        }
+      );
+      const data = response.data.data.products;
+      products = products.concat(data.edges.map((edge) => edge.node));
+      hasNextPage = data.pageInfo.hasNextPage;
+      cursor =
+        data.edges.length > 0 ? data.edges[data.edges.length - 1].cursor : null;
+    }
+
+    console.log(
+      `Fetched ${products.length} products:`,
+      JSON.stringify(products, null, 2)
+    );
+  } catch (error) {
+    console.error(
+      "Error fetching products:",
+      error.response?.data || error.message
+    );
+  }
+};
+
+getProduct();

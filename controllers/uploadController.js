@@ -18,21 +18,56 @@ const uploadFile = async (req, res, next) => {
     return next(error);
   }
   const products = await readCSVFile(req.file.path);
-  createJsonlFile(products, "products.jsonl");
-  performBulkProductImport();
+  // createJsonlFile(products, "products.jsonl");
+  // performBulkProductImport();
+  let processedProducts = [];
+  for (const product of products) {
+    if (product.active === 1) {
+      let tokens = product.Name.split(":");
+      let handle = cleanHyphens(tokens[1]);
+      let size = product["NRT sizes"];
+      if (size) {
+        tokens = handle.split("-");
+        handle = tokens[0] + "-" + tokens[1];
+      }
+      const filterData = products.filter((item) => item.Name.includes(handle));
+      let sizes = [];
+      for (let item of filterData) {
+        item["active"] = 0;
+        sizes.push(item["NRT sizes"]);
+      }
+      //console.log(JSON.stringify(filterData, null, 2));
+      product["NRT sizes"] = sizes;
+      processedProducts.push(product);
+    }
+  }
   res.json({
     message: "File uploaded successfully",
-    data: products,
+    size: processedProducts.length,
+    data: processedProducts,
   });
 };
+
+function cleanHyphens(str) {
+  // Replace multiple hyphens with a single hyphen
+  str = str.replace(/-+/g, "-");
+
+  // Remove spaces before and after hyphens
+  str = str.replace(/\s*-\s*/g, "-");
+
+  // Remove leading/trailing hyphens and spaces
+  return str.trim().replace(/^-|-$/g, "");
+}
 
 async function readCSVFile(filePath) {
   const results = [];
   const stream = fs.createReadStream(filePath).pipe(csv());
   for await (const row of stream) {
     try {
-      const processedRow = await processData(row); // Process each row
-      results.push(processedRow); // Add the processed row to results
+      // const processedRow = await processData(row); // Process each row
+      //results.push(processedRow); // Add the processed row to results
+      row["active"] = 1;
+      results.push(row);
     } catch (error) {
       console.error("Error processing row:", error);
     }
