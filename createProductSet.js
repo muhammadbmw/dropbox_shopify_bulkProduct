@@ -11,7 +11,7 @@ const headers = {
 };
 
 const createProduct = async () => {
-  let handle = "YTS-Sapph";
+  let handle = "yts-Sapph";
   let title = "Youth Basic Tee";
   let size = ["Small", "Medium", "Large", "XL"];
   //let size = "Small";
@@ -35,11 +35,19 @@ const createProduct = async () => {
         },
       ],
       sku: sku + "-" + size[i],
+      inventoryPolicy: "DENY",
+      inventoryQuantities: [
+        {
+          locationId: "gid://shopify/Location/95240028437",
+          name: "available",
+          quantity: 12,
+        },
+      ],
     };
     productOptionsSizes.push(pOption);
     productVariantsValues.push(vValues);
   }
-
+  //console.log(JSON.stringify(productVariantsValues, null, 2));
   // let image_name = "ACN Heather Charcoal";
   // let image_src =
   //   "https://uc91bd8076d9cf4db5097cd8941d.dl.dropboxusercontent.com/cd/0/get/CgN0DU69P2EbFyVG7dRMj_64-_vflsPKfy7adlCOyCYAQiLaigq8w62uhtLlZI9MYH2dzRj5xm-nKd7CoXx6fj1s8FCLEGZthB8ML6-iFYJg4YD3fqGBb2Wr5nfJzxtl-RAMzxQIT4lksR0Kd6yMbjNlPoamb5KvxopSFonWQJhNfA/file";
@@ -75,6 +83,7 @@ const createProduct = async () => {
       title,
       descriptionHtml,
       handle,
+
       productOptions: [
         {
           name: "Color",
@@ -146,7 +155,7 @@ const createProduct = async () => {
       { headers }
     );
     const { data, errors } = response.data;
-    console.log(JSON.stringify(data));
+    console.log(JSON.stringify(data, null, 2));
   } catch (error) {
     console.error(
       "Error creating product:",

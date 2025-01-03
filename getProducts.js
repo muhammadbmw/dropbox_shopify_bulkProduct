@@ -21,8 +21,8 @@ const query = `
             id
             title
             handle
-            createdAt
-            updatedAt
+          totalInventory
+          tracksInventory
             variants(first: 10) {
               edges {
                 node {
