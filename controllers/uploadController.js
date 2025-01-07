@@ -32,12 +32,16 @@ const uploadFile = async (req, res, next) => {
       }
       const filterData = products.filter((item) => item.Name.includes(handle));
       let sizes = [];
+      let hand = [];
       for (let item of filterData) {
         item["active"] = 0;
-        sizes.push(item["NRT sizes"]);
+        if (item["NRT sizes"]) sizes.push(item["NRT sizes"]);
+        hand.push(Number(item["On Hand"]));
       }
       //console.log(JSON.stringify(filterData, null, 2));
       product["NRT sizes"] = sizes;
+      product["On Hand"] = hand;
+      product["handle"] = handle;
       processedProducts.push(product);
     }
   }

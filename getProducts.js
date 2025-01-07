@@ -70,6 +70,8 @@ const getProduct = async () => {
       `Fetched ${products.length} products:`,
       JSON.stringify(products, null, 2)
     );
+    const locations = await getLocations();
+    console.log("Locations:", locations[0].id);
   } catch (error) {
     console.error(
       "Error fetching products:",
@@ -77,5 +79,47 @@ const getProduct = async () => {
     );
   }
 };
+
+// Function to send GraphQL requests
+async function shopifyGraphQL(query, variables = {}) {
+  try {
+    const response = await axios.post(
+      SHOPIFY_URL,
+      { query, variables },
+      {
+        headers,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "GraphQL Request Failed:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+// Fetch Locations
+async function getLocations() {
+  const query = `
+    query {
+      locations(first: 5) {
+        edges {
+          node {
+            id
+            name
+       
+          }
+        }
+      }
+    }
+  `;
+
+  const response = await shopifyGraphQL(query);
+  console.log(JSON.stringify(response, null, 2));
+  return response.data.locations.edges.map((edge) => edge.node);
+}
 
 getProduct();

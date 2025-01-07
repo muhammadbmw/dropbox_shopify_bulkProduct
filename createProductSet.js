@@ -57,6 +57,16 @@ const createProduct = async () => {
   productSet(synchronous: $synchronous, input: $productSet) {
     product {
       id
+      variants(first: 10) {
+              edges {
+                node {
+                  id
+                  inventoryItem {
+                    id
+                  }
+                }
+              }
+            }
     }
     productSetOperation {
       id
@@ -78,7 +88,7 @@ const createProduct = async () => {
   // send the GraphQL request
 
   const variables = {
-    synchronous: false,
+    synchronous: true,
     productSet: {
       title,
       descriptionHtml,
