@@ -85,7 +85,12 @@ const getImageUrl = async (image_name) => {
       {
         match_field_options: { include_highlights: false },
         query: `${image_name}`,
-        options: { max_results: 1, filename_only: true, file_status: "active" },
+        options: {
+          max_results: 1,
+          filename_only: true,
+          file_status: "active",
+          path: "/Product Photos",
+        },
       },
       {
         headers: {
@@ -94,8 +99,8 @@ const getImageUrl = async (image_name) => {
         },
       }
     );
-
-    if (response.data) {
+    //console.log(JSON.stringify(response.data, null, 2));
+    if (response.data.matches.length > 0) {
       path_display = response.data.matches[0].metadata.metadata.path_display;
 
       const response2 = await axios.post(

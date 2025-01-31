@@ -27,9 +27,7 @@ const query = `
               edges {
                 node {
                   id
-                  title
                   sku
-                  price
                 }
               }
             }
@@ -70,8 +68,8 @@ const getProduct = async () => {
       `Fetched ${products.length} products:`,
       JSON.stringify(products, null, 2)
     );
-    const locations = await getLocations();
-    console.log("Locations:", locations[0].id);
+    //const locations = await getLocations();
+    //console.log("Locations:", locations[0].id);
   } catch (error) {
     console.error(
       "Error fetching products:",

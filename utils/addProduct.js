@@ -79,32 +79,71 @@ async function publishProduct(productId, publicationId) {
 
 module.exports = async (data) => {
   let handle = data["handle"].toLowerCase();
-  let title = data["Name"] + "-" + data["Display Name"];
+  let title = data["Display Name"];
   let size = data["NRT sizes"];
   let color = data["NRT Colors"];
   let descriptionHtml = data["Store Description"];
   let sku = handle;
   let itemQuantity = data["On Hand"];
-  //let image_name = data["Image Name"];
-  //let image_src = await getImageUrl(image_name);
+  let image_name = data["Image Name"];
+  let image_src = [];
+  for (let i in image_name) image_src[i] = await getImageUrl(image_name[i]);
 
-  if (size.length > 0) {
-    let productOptionsSizes = [];
-    let productVariantsValues = [];
-    for (let i in size) {
-      let pOption = { name: size[i] };
+  let productOptionsSizes = [];
+  let productVariantsValues = [];
+  let productOptionsColors = [];
+  let imageFiles = [];
+  let imageFile;
+
+  // if (size.length > 0) {
+  //   for (let i in size) {
+  //     let pOption = { name: size[i] };
+  //     let vValues = {
+  //       optionValues: [
+  //         {
+  //           optionName: "Color",
+  //           name: color,
+  //         },
+  //         {
+  //           optionName: "Size",
+  //           name: size[i],
+  //         },
+  //       ],
+  //       sku: sku + "-" + size[i],
+  //       inventoryPolicy: "DENY",
+  //       inventoryQuantities: [
+  //         {
+  //           locationId: "gid://shopify/Location/95240028437",
+  //           name: "available",
+  //           quantity: itemQuantity[i],
+  //         },
+  //       ],
+  //     };
+  //     productOptionsSizes.push(pOption);
+  //     productVariantsValues.push(vValues);
+  //   }
+  // }
+  if (size.length === 0 && color.length > 0) {
+    for (let i in color) {
+      imageFile = "";
+      let pOption = { name: color[i] };
+      if (image_src[i].length > 0) {
+        imageFile = {
+          originalSource: image_src[i],
+          alt: image_name[i],
+          filename: image_name[i],
+          contentType: "IMAGE",
+        };
+      }
       let vValues = {
         optionValues: [
           {
             optionName: "Color",
-            name: color,
-          },
-          {
-            optionName: "Size",
-            name: size[i],
+            name: color[i],
           },
         ],
-        sku: sku + "-" + size[i],
+        file: imageFile,
+        sku: sku + "-" + color[i],
         inventoryPolicy: "DENY",
         inventoryQuantities: [
           {
@@ -114,8 +153,9 @@ module.exports = async (data) => {
           },
         ],
       };
-      productOptionsSizes.push(pOption);
+      productOptionsColors.push(pOption);
       productVariantsValues.push(vValues);
+      imageFiles.push(imageFile);
     }
   }
 
@@ -145,85 +185,117 @@ module.exports = async (data) => {
     `;
   // send the GraphQL request
   let variables;
-  if (size.length > 0) {
+  // if (size.length > 0) {
+  //   variables = {
+  //     synchronous: true,
+  //     productSet: {
+  //       title,
+  //       status: "DRAFT",
+  //       descriptionHtml,
+  //       handle,
+  //       productOptions: [
+  //         {
+  //           name: "Color",
+  //           position: 1,
+  //           values: [
+  //             {
+  //               name: color,
+  //             },
+  //           ],
+  //         },
+  //         {
+  //           name: "Size",
+  //           position: 2,
+  //           values: productOptionsSizes,
+  //         },
+  //       ],
+  //       // files: [
+  //       //   {
+  //       //     originalSource: image_src,
+  //       //     alt: image_name,
+  //       //     filename: image_name,
+  //       //     contentType: "IMAGE",
+  //       //   },
+  //       // ],
+  //       variants: productVariantsValues,
+  //     },
+  //   };
+  // } else {
+  //   variables = {
+  //     synchronous: true,
+  //     productSet: {
+  //       title,
+  //       status: "DRAFT",
+  //       descriptionHtml,
+  //       handle,
+  //       productOptions: [
+  //         {
+  //           name: "Color",
+  //           position: 1,
+  //           values: [
+  //             {
+  //               name: color,
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //       // files: [
+  //       //   {
+  //       //     originalSource: image_src,
+  //       //     alt: image_name,
+  //       //     filename: image_name,
+  //       //     contentType: "IMAGE",
+  //       //   },
+  //       // ],
+  //       variants: [
+  //         {
+  //           optionValues: [
+  //             {
+  //               optionName: "Color",
+  //               name: color,
+  //             },
+  //           ],
+  //           sku,
+  //           inventoryPolicy: "DENY",
+  //           inventoryQuantities: [
+  //             {
+  //               locationId: "gid://shopify/Location/95240028437",
+  //               name: "available",
+  //               quantity: itemQuantity[0],
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //   };
+  // }
+  // if (image_src.length > 0) {
+  //   variables.productSet.files = [
+  //     {
+  //       originalSource: image_src,
+  //       alt: image_name,
+  //       filename: image_name,
+  //       contentType: "IMAGE",
+  //     },
+  //   ];
+  // }
+  if (size.length === 0 && color.length > 0) {
     variables = {
       synchronous: true,
       productSet: {
         title,
+        //status: "DRAFT",
         descriptionHtml,
         handle,
         productOptions: [
           {
             name: "Color",
             position: 1,
-            values: [
-              {
-                name: color,
-              },
-            ],
-          },
-          {
-            name: "Size",
-            position: 2,
-            values: productOptionsSizes,
+            values: productOptionsColors,
           },
         ],
-        // files: [
-        //   {
-        //     originalSource: image_src,
-        //     alt: image_name,
-        //     filename: image_name,
-        //     contentType: "IMAGE",
-        //   },
-        // ],
+        files: imageFiles,
         variants: productVariantsValues,
-      },
-    };
-  } else {
-    variables = {
-      synchronous: true,
-      productSet: {
-        title,
-        descriptionHtml,
-        handle,
-        productOptions: [
-          {
-            name: "Color",
-            position: 1,
-            values: [
-              {
-                name: color,
-              },
-            ],
-          },
-        ],
-        // files: [
-        //   {
-        //     originalSource: image_src,
-        //     alt: image_name,
-        //     filename: image_name,
-        //     contentType: "IMAGE",
-        //   },
-        // ],
-        variants: [
-          {
-            optionValues: [
-              {
-                optionName: "Color",
-                name: color,
-              },
-            ],
-            sku,
-            inventoryPolicy: "DENY",
-            inventoryQuantities: [
-              {
-                locationId: "gid://shopify/Location/95240028437",
-                name: "available",
-                quantity: itemQuantity[0],
-              },
-            ],
-          },
-        ],
       },
     };
   }
@@ -246,6 +318,7 @@ module.exports = async (data) => {
       await publishProduct(productId, publicationId);
       //console.log("Product Published:", publishedProduct);
     }
+    return productId;
   }
 
   return response.data;

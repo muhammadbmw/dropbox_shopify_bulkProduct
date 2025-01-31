@@ -1,8 +1,10 @@
 const csv = require("csv-parser");
 const fs = require("fs");
 const path = require("path");
-const processData = require("../utils/processData");
-const performBulkProductImport = require("../utils/bulkProductImport");
+const addProduct = require("../utils/addProduct");
+const checkProductExists = require("../utils/checkProductExists");
+//const processData = require("../utils/processData");
+//const performBulkProductImport = require("../utils/bulkProductImport");
 
 // Controller function to handle successful file uploads
 const uploadFile = async (req, res, next) => {
@@ -24,27 +26,58 @@ const uploadFile = async (req, res, next) => {
   for (const product of products) {
     if (product.active === 1) {
       let tokens = product.Name.split(":");
-      let handle = cleanHyphens(tokens[1]);
+      let name = cleanHyphens(tokens[0]);
+
       let size = product["NRT sizes"];
-      if (size) {
-        tokens = handle.split("-");
-        handle = tokens[0] + "-" + tokens[1];
-      }
-      const filterData = products.filter((item) => item.Name.includes(handle));
+      let color = product["NRT Colors"];
+      let image = product["Image Name"];
+      // if (size) {
+      //   tokens = name.split("-");
+      //   name = tokens[0] + "-" + tokens[1];
+      // }
+      const filterData = products.filter((item) => item.Parent === name);
       let sizes = [];
       let hand = [];
+      let colors = [];
+      let images = [];
       for (let item of filterData) {
         item["active"] = 0;
         if (item["NRT sizes"]) sizes.push(item["NRT sizes"]);
         hand.push(Number(item["On Hand"]));
+        colors.push(item["NRT Colors"]);
+        images.push(item["Image Name"]);
       }
       //console.log(JSON.stringify(filterData, null, 2));
+      //  let handle = product["Image Name"].replace(/[_ ]/g, "-").toLowerCase();
+      let handle = name;
       product["NRT sizes"] = sizes;
+      product["NRT Colors"] = colors;
       product["On Hand"] = hand;
       product["handle"] = handle;
+      product["Image Name"] = images;
       processedProducts.push(product);
     }
   }
+
+  // Define the file path
+  // const filePath = path.join("uploads", "addProduct.txt");
+  // const timestamp = getCurrentTimestamp();
+  // let dataToAppend = `\n[${timestamp}] : Add products\n`;
+  // let number = 1;
+  // for (const product of processedProducts) {
+  //   const productExist = await checkProductExists(product.handle);
+  //   if (!productExist) {
+  //     const response = await addProduct(product);
+  //     //console.log(response);
+  //     dataToAppend += `\n${number++}: ${response}\n`;
+  //   } else {
+  //     //console.log("Product exists");
+  //     dataToAppend += `\n${number++}: Product handle ${
+  //       product.handle
+  //     } exists\n`;
+  //   }
+  //   fs.writeFileSync(filePath, dataToAppend);
+  // }
   res.json({
     message: "File uploaded successfully",
     size: processedProducts.length,
@@ -94,5 +127,11 @@ function createJsonlFile(products, outputPath) {
   fs.writeFileSync(outputPath, jsonlData, "utf8");
   // console.log(`JSONL file created at ${outputPath}`);
 }
+
+// Helper function to get the current timestamp
+const getCurrentTimestamp = () => {
+  const now = new Date();
+  return now.toLocaleString();
+};
 
 module.exports = { uploadFile, uploadErrorHandler };
