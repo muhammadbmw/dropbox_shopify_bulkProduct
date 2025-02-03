@@ -224,9 +224,13 @@ const testProduct = async () => {
   let itemQuantity = data["On Hand"];
   let image_name = [...new Set(data["Image Name"])];
   let image_src = [];
+  let images = new Map();
 
-  for (let i in image_name) image_src[i] = await getImageUrl(image_name[i]);
-
+  for (let i in image_name) {
+    image_src[i] = await getImageUrl(image_name[i]);
+    images.set(image_name[i], image_src[i]);
+  }
+  //console.log(images);
   let productOptionsSizes = [];
   let productVariantsValues = [];
   let productOptionsColors = [];
@@ -281,10 +285,13 @@ const testProduct = async () => {
 
       productOptionsColors.push(pOptionColor);
       // productVariantsValues.push(vValues);
-      if (Object.keys(imageFile).length > 0) imageFiles.push(imageFile);
+      if (Object.keys(imageFile).length > 0) 
+        imageFiles.push(imageFile);
     }
+   // console.log(imageFiles);
 
     for (let i in itemQuantity) {
+
       let vValues = {
         optionValues: [
           {
@@ -297,7 +304,7 @@ const testProduct = async () => {
           },
         ],
         // file: imageFiles[i],
-        sku: sku + "-" + color[i] + "-" + size[i],
+        sku: sku + "-" + data["NRT Colors"][i] + "-" + size[i],
         inventoryPolicy: "DENY",
         inventoryQuantities: [
           {
@@ -307,6 +314,17 @@ const testProduct = async () => {
           },
         ],
       };
+      //console.log(images.get(data["Image Name"][i].length));
+      if (images.get(data["Image Name"][i])) {
+        imageFile = {
+          originalSource: images.get(data["Image Name"][i]),
+          alt: data["Image Name"][i],
+          filename: data["Image Name"][i],
+          contentType: "IMAGE",
+        };
+        vValues.file = imageFile;
+        //console.log(imageFile);
+      }
       productVariantsValues.push(vValues);
     }
     size = [...new Set(size)];
@@ -316,7 +334,7 @@ const testProduct = async () => {
     }
   }
   //console.log(productOptionsColors, imageFiles, productOptionsSizes);
-  console.log(JSON.stringify(productVariantsValues, null, 2));
+//  console.log(JSON.stringify(productVariantsValues, null, 2));
 
   //console.log(JSON.stringify(productVariantsValues, null, 2));
   let variables;
