@@ -60,24 +60,24 @@ const uploadFile = async (req, res, next) => {
   }
 
   // Define the file path
-  // const filePath = path.join("uploads", "addProduct.txt");
-  // const timestamp = getCurrentTimestamp();
-  // let dataToAppend = `\n[${timestamp}] : Add products\n`;
-  // let number = 1;
-  // for (const product of processedProducts) {
-  //   const productExist = await checkProductExists(product.handle);
-  //   if (!productExist) {
-  //     const response = await addProduct(product);
-  //     //console.log(response);
-  //     dataToAppend += `\n${number++}: ${response}\n`;
-  //   } else {
-  //     //console.log("Product exists");
-  //     dataToAppend += `\n${number++}: Product handle ${
-  //       product.handle
-  //     } exists\n`;
-  //   }
-  //   fs.writeFileSync(filePath, dataToAppend);
-  // }
+  const filePath = path.join("uploads", "addProduct.txt");
+  const timestamp = getCurrentTimestamp();
+  let dataToAppend = `\n[${timestamp}] : Add products\n`;
+  let number = 1;
+  for (const product of processedProducts) {
+    const productExist = await checkProductExists(product.handle);
+    if (!productExist) {
+      const response = await addProduct(product);
+      //console.log(response);
+      dataToAppend += `\n${number++}: ${response}\n`;
+    } else {
+      //console.log("Product exists");
+      dataToAppend += `\n${number++}: Product handle ${
+        product.handle
+      } exists\n`;
+    }
+    fs.writeFileSync(filePath, dataToAppend);
+  }
   res.json({
     message: "File uploaded successfully",
     size: processedProducts.length,
