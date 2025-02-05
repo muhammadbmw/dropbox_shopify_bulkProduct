@@ -85,6 +85,7 @@ module.exports = async (data) => {
   let descriptionHtml = data["Store Description"];
   let sku = handle;
   let itemQuantity = data["On Hand"];
+  let price = data["Online Price"];
   let image_name = [...new Set(data["Image Name"])];
   let image_src = [];
   let images = new Map();
@@ -128,6 +129,7 @@ module.exports = async (data) => {
             quantity: itemQuantity[i],
           },
         ],
+        price: price[i]
       };
       productOptionsColors.push(pOption);
       productVariantsValues.push(vValues);
@@ -176,6 +178,7 @@ module.exports = async (data) => {
             quantity: itemQuantity[i],
           },
         ],
+        price: price[i]
       };
       //console.log(images.get(data["Image Name"][i].length));
       if (images.get(data["Image Name"][i])) {

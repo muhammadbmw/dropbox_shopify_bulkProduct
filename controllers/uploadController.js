@@ -31,6 +31,7 @@ const uploadFile = async (req, res, next) => {
       let size = product["NRT sizes"];
       let color = product["NRT Colors"];
       let image = product["Image Name"];
+      let price = product["Online Price"];
       // if (size) {
       //   tokens = name.split("-");
       //   name = tokens[0] + "-" + tokens[1];
@@ -40,12 +41,14 @@ const uploadFile = async (req, res, next) => {
       let hand = [];
       let colors = [];
       let images = [];
+      let prices = [];
       for (let item of filterData) {
         item["active"] = 0;
         if (item["NRT sizes"]) sizes.push(item["NRT sizes"]);
         hand.push(Number(item["On Hand"]));
         colors.push(item["NRT Colors"]);
         images.push(item["Image Name"]);
+        prices.push(item["Online Price"]);
       }
       //console.log(JSON.stringify(filterData, null, 2));
       //  let handle = product["Image Name"].replace(/[_ ]/g, "-").toLowerCase();
@@ -55,6 +58,7 @@ const uploadFile = async (req, res, next) => {
       product["On Hand"] = hand;
       product["handle"] = handle;
       product["Image Name"] = images;
+      product["Online Price"] = prices;
       processedProducts.push(product);
     }
   }
