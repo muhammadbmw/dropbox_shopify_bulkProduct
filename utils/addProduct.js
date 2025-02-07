@@ -102,7 +102,7 @@ module.exports = async (data) => {
   let imageFile;
   if (size.length === 0 && color.length > 0) {
     for (let i in color) {
-      imageFile = "";
+      imageFile = {};
       let pOption = { name: color[i] };
       if (image_src[i].length > 0) {
         imageFile = {
@@ -119,7 +119,7 @@ module.exports = async (data) => {
             name: color[i],
           },
         ],
-        file: imageFile,
+        // file: imageFile,
         sku: sku + "-" + color[i],
         inventoryPolicy: "DENY",
         inventoryQuantities: [
@@ -129,11 +129,16 @@ module.exports = async (data) => {
             quantity: itemQuantity[i],
           },
         ],
-        price: price[i]
+        price: price[i],
       };
       productOptionsColors.push(pOption);
+
+      if (Object.keys(imageFile).length > 0) {
+        vValues.file = imageFile;
+        imageFiles.push(imageFile);
+      }
+      //imageFiles.push(imageFile);
       productVariantsValues.push(vValues);
-      imageFiles.push(imageFile);
     }
   } else {
     for (let i in color) {
@@ -150,13 +155,11 @@ module.exports = async (data) => {
 
       productOptionsColors.push(pOptionColor);
       // productVariantsValues.push(vValues);
-      if (Object.keys(imageFile).length > 0) 
-        imageFiles.push(imageFile);
+      if (Object.keys(imageFile).length > 0) imageFiles.push(imageFile);
     }
-   // console.log(imageFiles);
+    // console.log(imageFiles);
 
     for (let i in itemQuantity) {
-
       let vValues = {
         optionValues: [
           {
@@ -178,7 +181,7 @@ module.exports = async (data) => {
             quantity: itemQuantity[i],
           },
         ],
-        price: price[i]
+        price: price[i],
       };
       //console.log(images.get(data["Image Name"][i].length));
       if (images.get(data["Image Name"][i])) {
@@ -231,7 +234,7 @@ module.exports = async (data) => {
       synchronous: true,
       productSet: {
         title,
-        //status: "DRAFT",
+        status: "DRAFT",
         descriptionHtml,
         handle,
         productOptions: [
@@ -250,7 +253,7 @@ module.exports = async (data) => {
       synchronous: true,
       productSet: {
         title,
-        //status: "DRAFT",
+        status: "DRAFT",
         descriptionHtml,
         handle,
         productOptions: [
@@ -270,7 +273,6 @@ module.exports = async (data) => {
       },
     };
   }
-
 
   const response = await executeGraphQL(query, variables);
   //console.log(JSON.stringify(response.data, null, 2));

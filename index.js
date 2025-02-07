@@ -97,7 +97,7 @@ app.get("/getFileUrl", async (req, res) => {
   // const storedAccessToken = process.env.DROPBOX_ACCESS_TOKEN;
   // const storedRefreshToken = process.env.DROPBOX_REFRESH_TOKEN;
   let path_display, link;
-  let image_name = "YTS_Orange";
+  let image_name = "ABC_Heather Charcoal";
   link = await getImageUrl(image_name);
   //console.log(link);
   res.json(link);

@@ -99,8 +99,11 @@ const getImageUrl = async (image_name) => {
         },
       }
     );
-    //console.log(JSON.stringify(response.data, null, 2));
-    if (response.data.matches.length > 0) {
+    // console.log(JSON.stringify(response.data, null, 2));
+    if (
+      response.data.matches.length > 0 &&
+      response.data.matches[0].metadata.metadata.name.includes(image_name)
+    ) {
       path_display = response.data.matches[0].metadata.metadata.path_display;
 
       const response2 = await axios.post(
