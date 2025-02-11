@@ -48,7 +48,7 @@ const uploadFile = async (req, res, next) => {
         hand.push(Number(item["On Hand"]));
         colors.push(item["NRT Colors"]);
         images.push(item["Image Name"]);
-        prices.push(item["Online Price"]);
+        prices.push(Number(item["Online Price"]));
       }
       //console.log(JSON.stringify(filterData, null, 2));
       //  let handle = product["Image Name"].replace(/[_ ]/g, "-").toLowerCase();
@@ -69,7 +69,7 @@ const uploadFile = async (req, res, next) => {
   let dataToAppend = `\n[${timestamp}] : Add products\n`;
   let number = 1;
   for (const product of processedProducts) {
-    const productExist = await checkProductExists(product.handle);
+    const productExist = await checkProductExists(product.handle.toLowerCase());
     if (!productExist) {
       const response = await addProduct(product);
       //console.log(response);

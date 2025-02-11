@@ -285,13 +285,11 @@ const testProduct = async () => {
 
       productOptionsColors.push(pOptionColor);
       // productVariantsValues.push(vValues);
-      if (Object.keys(imageFile).length > 0) 
-        imageFiles.push(imageFile);
+      if (Object.keys(imageFile).length > 0) imageFiles.push(imageFile);
     }
-   // console.log(imageFiles);
+    // console.log(imageFiles);
 
     for (let i in itemQuantity) {
-
       let vValues = {
         optionValues: [
           {
@@ -314,7 +312,9 @@ const testProduct = async () => {
           },
         ],
       };
-      console.log(`Color: ${data["NRT Colors"][i]}, Size: ${size[i]}, Quantity: ${itemQuantity[i]}\n`)
+      console.log(
+        `Color: ${data["NRT Colors"][i]}, Size: ${size[i]}, Quantity: ${itemQuantity[i]}\n`
+      );
       //console.log(images.get(data["Image Name"][i].length));
       if (images.get(data["Image Name"][i])) {
         imageFile = {
@@ -335,7 +335,7 @@ const testProduct = async () => {
     }
   }
   //console.log(productOptionsColors, imageFiles, productOptionsSizes);
-//  console.log(JSON.stringify(productVariantsValues, null, 2));
+  //  console.log(JSON.stringify(productVariantsValues, null, 2));
 
   //console.log(JSON.stringify(productVariantsValues, null, 2));
   let variables;
@@ -384,11 +384,11 @@ const testProduct = async () => {
     };
   }
 
- // console.log(JSON.stringify(variables, null, 2));
-    // const productExist = await checkProductExists(data.handle.toLowerCase());
-    // if (!productExist) {
-    //   const response = await addProduct(data);
-    //   console.log(response);
-    // } else console.log("Product exists");
+  console.log(JSON.stringify(variables, null, 2));
+  const productExist = await checkProductExists(data.handle.toLowerCase());
+  if (!productExist) {
+    const response = await addProduct(data);
+    console.log(response);
+  } else console.log("Product exists");
 };
 testProduct();
